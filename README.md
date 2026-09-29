@@ -16,7 +16,8 @@
 ## 📸 Ekran Görüntüleri
 
 **1. Katı Yetki İzolasyonu (Sadece Okuma Yetkisi Olan Restoran Görünümü)**
-<img width="1919" height="550" alt="image" src="https://github.com/user-attachments/assets/62a69b8d-1311-4b3a-b62f-daf7c0f610c4" />
+<img width="1906" height="759" alt="image" src="https://github.com/user-attachments/assets/82f650d4-0764-421a-97b3-dc49b7ffddb2" />
+
 
 
 **2. Evrensel Katalog ve Reçete Başvurusu**
