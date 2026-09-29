@@ -1,0 +1,6 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_gastro_ingredient,gastro.ingredient,model_gastro_ingredient,gastro_base.group_gastro_user,1,0,0,0
+access_gastro_local_inventory,gastro.local.inventory,model_gastro_local_inventory,base.group_user,1,1,1,1
+access_gastro_procure_wizard,gastro.procure.wizard,model_gastro_procure_wizard,base.group_user,1,1,1,1
+access_gastro_supplier_offer,gastro.supplier.offer,model_gastro_supplier_offer,base.group_user,1,1,1,1
+

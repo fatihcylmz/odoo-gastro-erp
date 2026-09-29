@@ -1,0 +1,16 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_gastro_recipe,gastro.recipe.access,model_gastro_recipe,,1,1,1,1
+access_gastro_recipe_line,gastro.recipe.line.access,model_gastro_recipe_line,,1,1,1,1
+access_gastro_buyer_request_admin,gastro.buyer.request,model_gastro_buyer_request,gastro_base.group_gastro_admin,1,1,1,1
+access_gastro_buyer_request_buyer,gastro.buyer.request,model_gastro_buyer_request,gastro_base.group_gastro_buyer,1,1,1,1
+access_gastro_buyer_request_user,gastro.buyer.request,model_gastro_buyer_request,gastro_base.group_gastro_user,1,0,0,0
+access_gastro_restaurant_bid,gastro.restaurant.bid,model_gastro_restaurant_bid,,1,1,1,1
+access_gastro_restaurant_bid_line,gastro.restaurant.bid.line,model_gastro_restaurant_bid_line,gastro_base.group_gastro_user,1,1,1,1
+access_gastro_recipe_admin,gastro.recipe,model_gastro_recipe,gastro_base.group_gastro_admin,1,1,1,1
+access_gastro_ingredient_admin,gastro.ingredient,gastro_base.model_gastro_ingredient,gastro_base.group_gastro_admin,1,1,1,1
+access_gastro_recipe_user,gastro.recipe,model_gastro_recipe,gastro_base.group_gastro_user,1,0,0,0
+access_gastro_ingredient_user,gastro.ingredient,gastro_base.model_gastro_ingredient,gastro_base.group_gastro_user,1,0,0,0
+access_gastro_recipe_request_admin,gastro.recipe.request,model_gastro_recipe_request,gastro_base.group_gastro_admin,1,1,1,1
+access_gastro_recipe_request_user,gastro.recipe.request,model_gastro_recipe_request,gastro_base.group_gastro_user,1,1,1,0
+access_gastro_recipe_request_line,gastro.recipe.request.line,model_gastro_recipe_request_line,gastro_base.group_gastro_user,1,1,1,1
+access_gastro_recipe,gastro.recipe,model_gastro_recipe,gastro_base.group_gastro_user,0,0,0,0

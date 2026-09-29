@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="seq_gastro_production_order" model="ir.sequence">
+        <field name="name">Fason Üretim Teklifi</field>
+        <field name="code">gastro.production.order</field>
+        <field name="prefix">FASON/</field>
+        <field name="padding">4</field>
+        <field name="number_increment">1</field>
+    </record>
+</odoo>

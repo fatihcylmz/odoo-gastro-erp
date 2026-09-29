@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- 1. TEKLİF VER BUTONU İÇİN AKSİYON (YENİ) -->
+    <!-- Bu kod, ihalenin içindeyken restoranın teklif formunu açmasını sağlar -->
+    <record id="action_create_new_bid" model="ir.actions.act_window">
+        <field name="name">Teklif Ver</field>
+        <field name="res_model">gastro.restaurant.bid</field>
+        <field name="view_mode">form</field>
+        <field name="context">{'default_request_id': active_id}</field>
+    </record>
+
+    <!-- 2. ALICI TALEPLERİ FORMU (GÜNCELLENDİ) -->
+    <record id="view_gastro_buyer_request_form" model="ir.ui.view">
+        <field name="name">gastro.buyer.request.form</field>
+        <field name="model">gastro.buyer.request</field>
+        <field name="arch" type="xml">
+            <form string="İhale Talebi">
+                <header>
+                    <!-- Bu iki butonu sadece Alıcılar görebilir -->
+                    <button name="action_open_bidding" type="object" string="İhaleyi Aç" class="btn-primary" invisible="state != 'draft'" groups="gastro_base.group_gastro_buyer"/>
+                    <button name="action_close_bidding" type="object" string="İhaleyi Kapat" class="btn-secondary" invisible="state == 'closed'" groups="gastro_base.group_gastro_buyer"/>
+                    
+                    <!-- Teklif Ver butonunu sadece Restoranlar görebilir -->
+                    <button name="%(action_create_new_bid)d" type="action" string="Teklif Ver" class="btn-success" groups="gastro_base.group_gastro_user" invisible="state != 'open'"/>
+                    
+                    <field name="state" widget="statusbar" statusbar_visible="draft,open,closed"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <!-- İhale açıldıktan sonra hiçbir şey değiştirilemez -->
+                        <h1><field name="name" placeholder="Örn: 100 Kişilik Düğün Yemeği" readonly="state != 'draft'"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="buyer_id" readonly="state != 'draft'"/>
+                            <field name="recipe_id" readonly="state != 'draft'"/>
+                            <field name="expected_date" readonly="state != 'draft'"/>
+                        </group>
+                        <group>
+                            <field name="total_portions" readonly="state != 'draft'"/>
+                        </group>
+                    </group>
+                    
+                    <notebook>
+                        <page string="Gelen Teklifler" name="bids">
+                            <field name="bid_ids" readonly="1">
+                                <!-- Reddedilenleri silik, kabul edilenleri yeşil gösterir -->
+                                <list decoration-muted="state == 'rejected'" decoration-success="state == 'accepted'">
+                                    <field name="restaurant_id"/>
+                                    <field name="proposed_price" string="Fiyat (TL)"/>
+                                    <field name="state" widget="badge" decoration-success="state == 'accepted'" decoration-info="state == 'pending'" decoration-danger="state == 'rejected'"/>
+                                    
+                                    <!-- HIZLI AKSİYON BUTONLARI -->
+                                    <button name="action_accept_bid" type="object" string="Kabul Et" class="btn-success btn-sm" invisible="state != 'pending'" groups="gastro_base.group_gastro_buyer"/>
+                                    <button name="action_reject_bid" type="object" string="Reddet" class="btn-danger btn-sm" invisible="state != 'pending'" groups="gastro_base.group_gastro_buyer"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Özel Şartlar ve Detaylar">
+                            <field name="description" readonly="state != 'draft'"/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- ALICI TALEPLERİ LİSTESİ -->
+    <record id="view_gastro_buyer_request_list" model="ir.ui.view">
+        <field name="name">gastro.buyer.request.list</field>
+        <field name="model">gastro.buyer.request</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="expected_date"/>
+                <field name="total_portions"/>
+                <field name="state" widget="badge" decoration-success="state == 'open'" decoration-info="state == 'draft'" decoration-muted="state == 'closed'"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- RESTORAN TEKLİF FORMU (GELİŞMİŞ DEPO SEÇİMLİ VERSİYON) -->
+    <record id="view_gastro_restaurant_bid_form" model="ir.ui.view">
+        <field name="name">gastro.restaurant.bid.form</field>
+        <field name="model">gastro.restaurant.bid</field>
+        <field name="arch" type="xml">
+            <form string="Teklif Ver">
+                <header>
+                    <!-- Alıcının teklifi Kabul/Reddet butonları (Sadece Alıcı görebilir ve sadece Beklemede durumundayken çıkar) -->
+                    <button name="action_accept_bid" type="object" string="Kabul Et" class="btn-success" invisible="state != 'pending'" groups="gastro_base.group_gastro_buyer"/>
+                    <button name="action_reject_bid" type="object" string="Reddet" class="btn-danger" invisible="state != 'pending'" groups="gastro_base.group_gastro_buyer"/>
+                    
+                    <field name="state" widget="statusbar" statusbar_visible="pending,accepted,rejected"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group string="İhale Bilgileri">
+                            <field name="request_id" readonly="1"/>
+                            <field name="restaurant_id"/>
+                        </group>
+                        <group string="Maliyet ve Fiyatlandırma">
+                            <field name="raw_material_cost" readonly="1"/>
+                            <field name="commission_rate"/>
+                            <field name="proposed_price" readonly="1" decoration-bf="1"/>
+                        </group>
+                    </group>
+                    
+                    <notebook>
+                        <page string="Reçete Malzemeleri ve Depo Seçimi">
+                            <field name="line_ids">
+                                <!-- create="0" eklendi: Restoran artık manuel "Add a line" diyerek satır ekleyemez -->
+                                <list editable="bottom" create="0">
+                                    <field name="ingredient_id" column_invisible="True"/>
+                                    
+                                    <!-- force_save="1" eklendi: Odoo, readonly olsa bile bu veriyi zorla veritabanına kaydeder -->
+                                    <field name="ingredient_name" readonly="1" force_save="1" placeholder="Örn: Süt"/>
+                                    
+                                    <!-- Miktar ve Birim alanları kilitlendi (readonly="1") ve zorla kaydedildi -->
+                                    <field name="qty" readonly="1" force_save="1"/>
+                                    <field name="uom" readonly="1" force_save="1" placeholder="Lt, Kg"/>
+                                    
+                                    <!-- Restoran SADECE bu sütuna müdahale edebilir -->
+                                    <field name="local_inventory_id" 
+                                           options="{'no_create': True, 'no_open': True}" 
+                                           placeholder="Mutfak Deposundan Seçiniz..."/>
+                                    <field name="unit_price" readonly="1"/>
+                                    <field name="line_cost" readonly="1" sum="Toplam Maliyet"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Özel Notlar ve Şartlar">
+                            <field name="notes" placeholder="Teslimat veya üretim şartlarınızı buraya yazabilirsiniz..."/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- AKSİYONLAR VE MENÜLER -->
+    <record id="action_gastro_my_requests" model="ir.actions.act_window">
+        <field name="name">Taleplerim</field>
+        <field name="res_model">gastro.buyer.request</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <record id="action_gastro_open_tenders" model="ir.actions.act_window">
+        <field name="name">Açık İhaleler</field>
+        <field name="res_model">gastro.buyer.request</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('state', '=', 'open')]</field> 
+    </record>
+
+    <!-- İhale Merkezi Ana Menüsü (Hem Alıcı Hem Restoran Görebilir) -->
+    <menuitem id="menu_gastro_bidding_root" name="İhale Merkezi" parent="gastro_base.menu_gastro_root" sequence="30" groups="gastro_base.group_gastro_user,gastro_base.group_gastro_buyer"/>
+
+    <!-- Sadece Alıcı Görür -->
+    <menuitem id="menu_gastro_my_requests" name="Taleplerim (Alıcı)" parent="menu_gastro_bidding_root" action="action_gastro_my_requests" sequence="10" groups="gastro_base.group_gastro_buyer"/>
+
+    <!-- Sadece Restoran Görür -->
+    <menuitem id="menu_gastro_open_tenders" name="Açık İhaleler (Restoran)" parent="menu_gastro_bidding_root" action="action_gastro_open_tenders" sequence="20" groups="gastro_base.group_gastro_user"/>
+</odoo>

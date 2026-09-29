@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- 1. GRUP: TEDARİKÇİ -->
+    <record id="group_gastro_supplier" model="res.groups">
+        <field name="name">Tedarikçi</field>
+    </record>
+
+    <!-- 2. GRUP: KULLANICI (RESTORAN) -->
+    <record id="group_gastro_user" model="res.groups">
+        <field name="name">Restoran (Kullanıcı)</field>
+    </record>
+
+    <!-- 3. GRUP: SİSTEM YÖNETİCİSİ -->
+    <record id="group_gastro_admin" model="res.groups">
+        <field name="name">Sistem Yöneticisi</field>
+        <field name="implied_ids" eval="[(4, ref('group_gastro_user'))]"/>
+    </record>
+
+    <!-- GÜVENLİK KİLİDİ: Tedarikçi sadece kendi ilanını editleyebilir -->
+    <record id="rule_supplier_offer_own_modify" model="ir.rule">
+        <field name="name">Tedarikçi Sadece Kendi İlanını Düzenleyebilir</field>
+        <field name="model_id" ref="model_gastro_supplier_offer"/>
+        <field name="groups" eval="[(4, ref('group_gastro_supplier'))]"/>
+        <field name="domain_force">[('create_uid', '=', user.id)]</field>
+        <field name="perm_read" eval="0"/> 
+        <field name="perm_write" eval="1"/> 
+        <field name="perm_create" eval="0"/> 
+        <field name="perm_unlink" eval="1"/> 
+    </record>
+
+    <!-- 4. GRUP: ALICI (MÜŞTERİ) -->
+    <record id="group_gastro_buyer" model="res.groups">
+        <field name="name">Alıcı (Müşteri)</field>
+    </record>
+
+    <!-- GÜVENLİK KİLİDİ: Restoran sadece kendi deposunu görebilir -->
+    <record id="rule_local_inventory_own_only" model="ir.rule">
+        <field name="name">Restoran Sadece Kendi Deposunu Görebilir</field>
+        <field name="model_id" ref="model_gastro_local_inventory"/>
+        <field name="groups" eval="[(4, ref('group_gastro_user'))]"/> <!-- Restoran Yetkisi -->
+        <field name="domain_force">[('create_uid', '=', user.id)]</field>
+        <field name="perm_read" eval="1"/> 
+        <field name="perm_write" eval="1"/> 
+        <field name="perm_create" eval="1"/> 
+        <field name="perm_unlink" eval="1"/> 
+    </record>
+
+</odoo>

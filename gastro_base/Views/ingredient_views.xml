@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- 1. EVRENSEL KATALOG FORM GÖRÜNÜMÜ -->
+    <record id="view_gastro_ingredient_form" model="ir.ui.view">
+        <field name="name">gastro.ingredient.form</field>
+        <field name="model">gastro.ingredient</field>
+        <field name="arch" type="xml">
+            <form string="Evrensel Katalog">
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" placeholder="Örn: Süt"/></h1>
+                    </div>
+                    <group>
+                        <field name="category"/>
+                        <field name="uom"/>
+                    </group>
+                    
+                    <!-- Satış Yapanlar Paneli -->
+                    <notebook>
+                        <page string="Satış Yapan Tedarikçiler ve Fiyatlar">
+                            <field name="offer_ids">
+                                <list editable="bottom">
+                                    <field name="partner_id" placeholder="Tedarikçi Seçin..."/>
+                                    <field name="original_price" string="Normal Fiyat"/>
+                                    <field name="expiration_date" string="SKT"/>
+                                    <field name="discount_threshold_days" string="Eşik (Gün)"/>
+                                    <field name="discount_rate" string="İndirim (%)"/>
+                                    <field name="remaining_days" string="Kalan Gün"/>
+                                    <field name="price" string="Son Fiyat (TL)" readonly="1"/>
+                                    <field name="available_stock" string="Stok"/>
+                                    <field name="added_date" string="Eklenme"/>
+                                    <!-- WIZARD'A BAĞLANAN BUTON 1 -->
+                                    <button name="action_open_procure_wizard" type="object" string="Satın Al" icon="fa-shopping-cart" class="btn-primary"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- 2. EVRENSEL KATALOG DIŞ LİSTE GÖRÜNÜMÜ -->
+    <record id="view_gastro_ingredient_list" model="ir.ui.view">
+        <field name="name">gastro.ingredient.list</field>
+        <field name="model">gastro.ingredient</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="category"/>
+                <field name="uom"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="action_gastro_ingredient_catalog" model="ir.actions.act_window">
+        <field name="name">Evrensel Katalog</field>
+        <field name="res_model">gastro.ingredient</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <!-- 3. TEDARİKÇİ İLANLARI SAYFASI (ASIL KULLANILAN LİSTE) -->
+    <record id="view_gastro_supplier_offer_list" model="ir.ui.view">
+        <field name="name">gastro.supplier.offer.list</field>
+        <field name="model">gastro.supplier.offer</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="partner_id" placeholder="Firma Seçin..."/>
+                <field name="ingredient_id" placeholder="Ürün Seçin..."/>
+                <field name="available_stock" string="Stok"/>
+                <field name="stock_status" widget="badge" decoration-success="stock_status == 'var'" decoration-danger="stock_status == 'yok'"/>
+                
+                <field name="original_price" string="Normal Fiyat (TL)"/>
+                <field name="expiration_date" string="SKT"/>
+                <field name="discount_threshold_days" string="Eşik (Gün)"/>
+                <field name="discount_rate" string="İndirim (%)"/>
+                <field name="remaining_days" string="Kalan Gün"/>
+                <field name="price" string="Birim Fiyatı (TL)" readonly="1"/>
+                
+                <field name="added_date" string="Eklenme"/>
+                <!-- WIZARD'A BAĞLANAN BUTON 2 -->
+                <!-- WIZARD'A BAĞLANAN BUTON 2 -->
+                <button name="action_open_procure_wizard" type="object" string="Satın Al" icon="fa-shopping-cart" class="btn-primary" groups="gastro_base.group_gastro_admin,gastro_base.group_gastro_user"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_gastro_supplier_offer_form" model="ir.ui.view">
+        <field name="name">gastro.supplier.offer.form</field>
+        <field name="model">gastro.supplier.offer</field>
+        <field name="arch" type="xml">
+            <form string="Tedarikçi İlan Detayı">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="partner_id"/>
+                            <field name="ingredient_id"/>
+                            <field name="available_stock"/>
+                            <field name="stock_status" widget="badge" decoration-success="stock_status == 'var'" decoration-danger="stock_status == 'yok'"/>
+                        </group>
+                        <group>
+                            <field name="original_price"/>
+                            <field name="price" readonly="1"/>
+                            <field name="expiration_date"/>
+                            <field name="remaining_days"/>
+                            <field name="discount_threshold_days" string="İndirim Eşiği (Gün)"/>
+                            <field name="discount_rate" string="İndirim Oranı (%)"/>
+                        </group>
+                    </group>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_gastro_supplier_offer" model="ir.actions.act_window">
+        <field name="name">Tedarikçi İlanları</field>
+        <field name="res_model">gastro.supplier.offer</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+   
+    
+
+   <!-- TEDARİKÇİ İÇİN KENDİ PROFİLİ (Sadece kendi açtığı ilanlar) -->
+    <record id="action_gastro_my_offers" model="ir.actions.act_window">
+        <field name="name">Benim İlanlarım</field>
+        <field name="res_model">gastro.supplier.offer</field>
+        <field name="view_mode">list,form</field>
+        <!-- Filtre: Sadece oluşturan kişi kendisiyse göster -->
+        <field name="domain">[('create_uid', '=', uid)]</field>
+    </record>
+
+    <!-- PİYASA EKRANI (Fikir edinmek için herkesin ilanları) -->
+    <record id="action_gastro_all_offers" model="ir.actions.act_window">
+        <field name="name">Piyasayı İncele (Tüm İlanlar)</field>
+        <field name="res_model">gastro.supplier.offer</field>
+        <field name="view_mode">list,form</field>
+        <!-- Filtre yok, herkesi gösterir -->
+    </record>
+
+   <!-- ============================================== -->
+    <!-- MENÜLER VE YETKİLENDİRMELER (GÜNCELLENDİ)        -->
+    <!-- ============================================== -->
+
+    <!-- 1. ANA MENÜ 
+         Bu ana sekmeyi Admin, Restoran, Tedarikçi ve Alıcı görebilir. 
+         Ancak altındaki menüleri sadece kendi yetkilerine göre görürler. -->
+    <menuitem id="menu_gastro_root" 
+              name="Gastro ERP" 
+              sequence="10" 
+              groups="gastro_base.group_gastro_admin,gastro_base.group_gastro_user,gastro_base.group_gastro_supplier,gastro_base.group_gastro_buyer"/>
+    
+    <!-- 2. EVRENSEL KATALOG 
+         DİKKAT: Alıcı (Buyer) gruptan çıkarıldı. Sadece Admin ve Restoran görebilir. -->
+    <menuitem id="menu_gastro_catalog" 
+              name="Evrensel Katalog" 
+              parent="menu_gastro_root" 
+              action="action_gastro_ingredient_catalog" 
+              sequence="10" 
+              groups="gastro_base.group_gastro_admin"/>
+    
+    <!-- 3. TEDARİKÇİ PANELİ 
+         Sadece Tedarikçi görebilir. Alıcı buraya giremez. -->
+    <menuitem id="menu_gastro_supplier_panel" 
+              name="Tedarikçi Paneli" 
+              parent="menu_gastro_root" 
+              sequence="20" 
+              groups="gastro_base.group_gastro_supplier"/>
+    
+    <!-- Tedarikçi Alt Menüleri -->
+    <menuitem id="menu_gastro_my_offers" 
+              name="Benim İlanlarım" 
+              parent="menu_gastro_supplier_panel" 
+              action="action_gastro_my_offers" 
+              sequence="10"/>
+              
+    <menuitem id="menu_gastro_all_offers" 
+              name="Piyasayı İncele" 
+              parent="menu_gastro_supplier_panel" 
+              action="action_gastro_all_offers" 
+              sequence="20"/>
+
+</odoo>

@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- REÇETELER AKSİYONU -->
+    <record id="action_gastro_recipe" model="ir.actions.act_window">
+        <field name="name">Reçeteler</field>
+        <field name="res_model">gastro.recipe</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <!-- MENÜLER -->
+    <menuitem id="menu_gastro_kitchen" name="Mutfak" parent="gastro_base.menu_gastro_root" sequence="20" groups="gastro_base.group_gastro_admin,gastro_base.group_gastro_user"/>
+    <menuitem id="menu_gastro_recipe" name="Reçeteler" parent="menu_gastro_kitchen" action="action_gastro_recipe" sequence="10"/>
+
+    <!-- REÇETE FORM GÖRÜNÜMÜ -->
+    <record id="view_gastro_recipe_form" model="ir.ui.view">
+        <field name="name">gastro.recipe.form</field>
+        <field name="model">gastro.recipe</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,test,approved"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="portion_count"/>
+                        </group>
+                        <group>
+                            <field name="total_cost" widget="monetary"/>
+                            <field name="portion_cost" widget="monetary" decoration-bf="1" decoration-danger="portion_cost > 50"/>
+                        </group>
+                    </group>
+                    
+                    <notebook>
+                        <page string="Kullanılan Malzemeler">
+                            <field name="line_ids">
+                                <list editable="bottom">
+                                    <field name="ingredient_id"/>
+                                    <field name="qty"/>
+                                    <field name="uom"/>
+                                    <field name="line_cost" sum="Toplam Maliyet"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- REÇETE LİSTE GÖRÜNÜMÜ -->
+    <record id="view_gastro_recipe_list" model="ir.ui.view">
+        <field name="name">gastro.recipe.list</field>
+        <field name="model">gastro.recipe</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="portion_count"/>
+                <field name="portion_cost"/>
+                <field name="state" widget="badge" 
+                       decoration-info="state == 'draft'" 
+                       decoration-warning="state == 'test'" 
+                       decoration-success="state == 'approved'"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- REÇETE BAŞVURULARI AKSİYONU -->
+    <record id="action_gastro_recipe_request" model="ir.actions.act_window">
+        <field name="name">Reçete Başvuruları</field>
+        <field name="res_model">gastro.recipe.request</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <!-- REÇETE BAŞVURULARI LİSTE GÖRÜNÜMÜ -->
+    <record id="view_gastro_recipe_request_tree" model="ir.ui.view">
+        <field name="name">gastro.recipe.request.tree</field>
+        <field name="model">gastro.recipe.request</field>
+        <field name="arch" type="xml">
+            <list decoration-info="state == 'draft'" decoration-warning="state == 'submitted'" decoration-success="state == 'approved'" decoration-danger="state == 'rejected'">
+                <field name="name"/>
+                <field name="restaurant_id"/>
+                <field name="state" widget="badge" decoration-info="state == 'draft'" decoration-warning="state == 'submitted'" decoration-success="state == 'approved'" decoration-danger="state == 'rejected'"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- REÇETE BAŞVURULARI FORM GÖRÜNÜMÜ -->
+    <record id="view_gastro_recipe_request_form" model="ir.ui.view">
+        <field name="name">gastro.recipe.request.form</field>
+        <field name="model">gastro.recipe.request</field>
+        <field name="arch" type="xml">
+            <form string="Reçete Başvuru Formu">
+                <header>
+                    <button name="action_submit_request" type="object" string="Onaya Gönder" class="btn-primary" invisible="state != 'draft'" groups="gastro_base.group_gastro_user"/>
+                    <button name="action_approve_request" type="object" string="Kabul Et ve Reçete Oluştur" class="btn-success" invisible="state != 'submitted'" groups="gastro_base.group_gastro_admin"/>
+                    <button name="action_reject_request" type="object" string="Reddet" class="btn-danger" invisible="state != 'submitted'" groups="gastro_base.group_gastro_admin"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,submitted,approved,rejected"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" placeholder="Önerilen Reçete Adı..." readonly="state != 'draft'"/></h1>
+                    </div>
+                    <group>
+                        <field name="restaurant_id"/>
+                    </group>
+                    
+                    <notebook>
+                        <page string="Kullanılacak Hammaddeler">
+                            <field name="line_ids">
+                                <list editable="bottom">
+                                    <field name="ingredient_id"/>
+                                    <field name="qty"/>
+                                    <field name="uom"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- REÇETE BAŞVURULARI MENÜ ÖĞESİ -->
+    <menuitem id="menu_gastro_recipe_request" 
+              name="Reçete Başvuruları" 
+              parent="gastro_base.menu_gastro_root" 
+              action="action_gastro_recipe_request" 
+              sequence="10"/>
+
+</odoo>
